@@ -1,6 +1,7 @@
+from istorage import IStorage
+
 import json
 import requests
-from istorage import IStorage
 
 
 class StorageJson(IStorage):
@@ -17,31 +18,33 @@ class StorageJson(IStorage):
         try:
             with open(self.file_path, 'r') as file:
                 data = json.load(file)
+                self.data_movies = data
         except (FileNotFoundError, json.JSONDecodeError):
             data = {}
+            self.data_movies = data
 
-        for title, movie_data in data.items():
-            # Fetch the update information from the API for each movie in the data
-            api_url = f"http://www.omdbapi.com/?apikey=770a6d70&t={title}"
-            response = requests.get(api_url)
-            update_data = response.json()
+        if self.data_movies:
+            for title, movie_data in self.data_movies.items():
+                # Fetch the update information from the API for each movie in the data
+                api_url = f"http://www.omdbapi.com/?apikey=770a6d70&t={title}"
+                response = requests.get(api_url)
+                update_data = response.json()
 
-            # Check if response is successful
-            if update_data.get("Response") == "True":
-                updated_movie_data = {
-                    "rating": update_data.get("imdbRating"),
-                    "year": update_data.get("Year"),
-                    "poster_url": update_data.get("Poster")
-                }
-                data[title] = updated_movie_data
+                # Check if response is successful
+                if update_data.get("Response") == "True":
+                    updated_movie_data = {
+                        "rating": update_data.get("imdbRating"),
+                        "year": update_data.get("Year"),
+                        "poster_url": update_data.get("Poster")
+                    }
+                    movie_data.update(updated_movie_data)
 
-        self.data_movies = data
-        return data
+        return self.data_movies
 
     def list_movies(self):
         total_movies = len(self.data_movies)
         if total_movies == 0:
-            print("No movies found.")
+            return {}
         else:
             movies_dict = {}
             for title, movie_data in self.data_movies.items():
