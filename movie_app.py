@@ -134,7 +134,7 @@ class MovieApp:
         """
         for movie, movie_data in data_movies.items():
             """
-            calculating a similarity ratio between the user's input 
+            Calculating a similarity ratio between the user's input 
             and the current movie name using fuzz.token_set_ratio() 
             function from the fuzzywuzzy library
             """
@@ -186,9 +186,15 @@ class MovieApp:
         plt.ylabel('Frequency')
         plt.title('Movie Rating Histogram')
 
-        file_name = input("Enter the name of the file to save (including extension): ")
-        plt.savefig(file_name)
-        plt.show()
+        try:
+            file_name = input("Enter the name of the file to save (including extension): ")
+            plt.savefig(file_name)
+            plt.show()
+            print("The histogram was created successfully.")
+
+        except ValueError:
+            print("Please enter supported formats: eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, "
+                  "svg, svgz, tif, tiff, webp")
 
         input("Press Enter to continue")
 
@@ -205,6 +211,7 @@ class MovieApp:
         # Replace placeholder with actual template_content
         title_placeholder = "__TEMPLATE_TITLE__"
         movie_grid_placeholder = "__TEMPLATE_MOVIE_GRID__"
+        storage_name = input("Enter the storage_name: ")
 
         movie_list_items = ""
         for movie, movie_data in data_movies.items():
@@ -217,11 +224,11 @@ class MovieApp:
             movie_list_items += f"</li>\n"
 
         # Replace placeholder with actual content in the template
-        website_content = template_content.replace(title_placeholder, "Viki Movie App")
+        website_content = template_content.replace(title_placeholder, f"{storage_name} Movie App")
         website_content = website_content.replace(movie_grid_placeholder, movie_list_items)
 
         # Write the website content to index.html
-        with open("index.html", "w") as file:
+        with open(f"{storage_name}.html", "w") as file:
             file.write(website_content)
 
         print("Website was generated successfully.")
@@ -243,7 +250,7 @@ class MovieApp:
             print("10. Generate website")
             print("0. Exit")
 
-            choice = input("Enter your choice (0-9):")
+            choice = input("Enter your choice (0-10):")
 
             if choice == "1":
                 self._command_list_movies()
